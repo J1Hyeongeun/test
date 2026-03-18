@@ -1,0 +1,22 @@
+<html>
+<body>
+<h2>Notion Embed Test</h2>
+
+<button onclick="window.top.location='https://evil.com'">
+</button>
+
+<br><br>
+
+<button onclick="window.open('https://example.com')">
+</button>
+
+<script>
+console.log('Embed JS executed on domain: ' + document.domain);
+
+if (window.parent !== window) {
+  window.parent.postMessage({type:'xss-test', data:'hello'}, '*');
+  console.log('postMessage sent to parent');
+}
+</script>
+</body>
+</html>
